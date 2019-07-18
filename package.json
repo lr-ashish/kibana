@@ -139,6 +139,7 @@
     "@kbn/ui-shared-deps": "1.0.0",
     "@types/yauzl": "^2.9.1",
     "@logrhythm/icons": "^1.19.0",
+    "@logrhythm/nm-web-shared": "^1.1.1",
     "@logrhythm/webui": "^5.9.13",
     "@types/json-stable-stringify": "^1.0.32",
     "@types/lodash.clonedeep": "^4.5.4",
