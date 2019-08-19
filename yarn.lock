@@ -7360,6 +7360,11 @@ bail@^1.0.0:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/bail/-/bail-1.0.2.tgz#f7d6c1731630a9f9f0d4d35ed1f962e2074a1764"
   integrity sha1-99bBcxYwqfnw1NNe0fli4gdKF2Q=
 
+balanced-match@^0.4.2:
+  version "0.4.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
+  integrity sha1-yz8+PHMtwPAe5wtAPzAuYddwmDg=
+
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
