@@ -1,4 +1,10 @@
 /*
+ * Copyright 2019 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
+/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -218,29 +224,33 @@ export class ChromeService {
       docTitle,
 
       getHeaderComponent: () => (
-        <Header
-          loadingCount$={http.getLoadingCount$()}
-          application={application}
-          appTitle$={appTitle$.pipe(takeUntil(this.stop$))}
-          badge$={badge$.pipe(takeUntil(this.stop$))}
-          basePath={http.basePath}
-          breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
-          customNavLink$={customNavLink$.pipe(takeUntil(this.stop$))}
-          kibanaDocLink={docLinks.links.kibana}
-          forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
-          helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
-          helpSupportUrl$={helpSupportUrl$.pipe(takeUntil(this.stop$))}
-          homeHref={http.basePath.prepend('/app/home')}
-          isVisible$={this.isVisible$}
-          kibanaVersion={injectedMetadata.getKibanaVersion()}
-          navLinks$={navLinks.getNavLinks$()}
-          recentlyAccessed$={recentlyAccessed.get$()}
-          navControlsLeft$={navControls.getLeft$()}
-          navControlsCenter$={navControls.getCenter$()}
-          navControlsRight$={navControls.getRight$()}
-          onIsLockedUpdate={setIsNavDrawerLocked}
-          isLocked$={getIsNavDrawerLocked$}
-        />
+        <React.Fragment>
+          <LoadingIndicator loadingCount$={http.getLoadingCount$()} />
+
+          <Header
+            isCloudEnabled={injectedMetadata.getInjectedVar('isCloudEnabled') as boolean}
+            application={application}
+            appTitle$={appTitle$.pipe(takeUntil(this.stop$))}
+            badge$={badge$.pipe(takeUntil(this.stop$))}
+            basePath={http.basePath}
+            breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
+            kibanaDocLink={docLinks.links.kibana}
+            forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
+            // @ts-ignore
+            helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
+            homeHref={http.basePath.prepend('/app/kibana#/home')}
+            isVisible$={isVisible$.pipe(
+              map(visibility => (FORCE_HIDDEN ? false : visibility)),
+              takeUntil(this.stop$)
+            )}
+            kibanaVersion={injectedMetadata.getKibanaVersion()}
+            legacyMode={injectedMetadata.getLegacyMode()}
+            navLinks$={navLinks.getNavLinks$()}
+            recentlyAccessed$={recentlyAccessed.get$()}
+            navControlsLeft$={navControls.getLeft$()}
+            navControlsRight$={navControls.getRight$()}
+          />
+        </React.Fragment>
       ),
 
       setAppTitle: (appTitle: string) => appTitle$.next(appTitle),
