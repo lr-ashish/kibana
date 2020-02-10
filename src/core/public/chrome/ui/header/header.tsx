@@ -17,6 +17,14 @@
  * under the License.
  */
 
+import Url from 'url';
+
+import React, { Component, createRef } from 'react';
+import * as Rx from 'rxjs';
+
+import 'tether';
+import 'bootstrap';
+
 import {
   EuiHeader,
   EuiHeaderSection,
@@ -28,11 +36,14 @@ import {
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
-import classnames from 'classnames';
-import React, { createRef, useState } from 'react';
-import useObservable from 'react-use/lib/useObservable';
-import { Observable } from 'rxjs';
-import { LoadingIndicator } from '../';
+import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
+import LogRhythmNavbar from '../../../../../netmon/components/navbar';
+
+import { HeaderBadge } from './header_badge';
+import { HeaderBreadcrumbs } from './header_breadcrumbs';
+import { HeaderHelpMenu } from './header_help_menu';
+import { HeaderNavControls } from './header_nav_controls';
+
 import {
   ChromeBadge,
   ChromeBreadcrumb,
@@ -170,6 +181,52 @@ export function Header({
               appTitle$={observables.appTitle$}
               breadcrumbs$={observables.breadcrumbs$}
             />
+          ) : (
+            undefined
+          ),
+        'data-test-subj': 'navDrawerAppsMenuLink',
+      }));
+
+    const recentLinksArray = [
+      {
+        label: intl.formatMessage({
+          id: 'core.ui.chrome.sideGlobalNav.viewRecentItemsLabel',
+          defaultMessage: 'Recently viewed',
+        }),
+        iconType: 'clock',
+        isDisabled: recentlyAccessed.length > 0 ? false : true,
+        flyoutMenu: {
+          title: intl.formatMessage({
+            id: 'core.ui.chrome.sideGlobalNav.viewRecentItemsFlyoutTitle',
+            defaultMessage: 'Recent items',
+          }),
+          listItems: recentlyAccessed.map(item => ({
+            label: truncateRecentItemLabel(item.label),
+            title: item.title,
+            'aria-label': item.title,
+            href: item.href,
+            iconType: item.euiIconType,
+          })),
+        },
+      },
+    ];
+
+    return (
+      <header>
+        <LogRhythmNavbar />
+
+        {/* <EuiHeader>
+          <EuiHeaderSection grow={false}>
+            <EuiShowFor sizes={['xs', 's']}>
+              <EuiHeaderSectionItem border="right">{this.renderMenuTrigger()}</EuiHeaderSectionItem>
+            </EuiShowFor>
+
+            <EuiHeaderSectionItem border="right">{this.renderLogo()}</EuiHeaderSectionItem>
+
+            <HeaderNavControls side="left" navControls={navControlsLeft} />
+          </EuiHeaderSection>
+
+          <HeaderBreadcrumbs appTitle={appTitle} breadcrumbs$={breadcrumbs$} />
 
             <HeaderBadge badge$={observables.badge$} />
 
@@ -181,9 +238,13 @@ export function Header({
           </EuiHeader>
         </div>
 
-        <CollapsibleNav
-          appId$={application.currentAppId$}
-          id={navId}
+            <HeaderNavControls side="right" navControls={navControlsRight} />
+          </EuiHeaderSection>
+        </EuiHeader> */}
+
+        <EuiNavDrawer
+          ref={this.navDrawerRef}
+          data-test-subj="navDrawer"
           isLocked={isLocked}
           navLinks$={observables.navLinks$}
           recentlyAccessed$={observables.recentlyAccessed$}
