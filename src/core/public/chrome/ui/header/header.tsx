@@ -39,11 +39,6 @@ import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import LogRhythmNavbar from '../../../../../netmon/components/navbar';
 
-import { HeaderBadge } from './header_badge';
-import { HeaderBreadcrumbs } from './header_breadcrumbs';
-import { HeaderHelpMenu } from './header_help_menu';
-import { HeaderNavControls } from './header_nav_controls';
-
 import {
   ChromeBadge,
   ChromeBreadcrumb,
@@ -104,82 +99,47 @@ export function Header({
     return <LoadingIndicator loadingCount$={observables.loadingCount$} showAsBar />;
   }
 
-  const toggleCollapsibleNavRef = createRef<HTMLButtonElement>();
-  const navId = htmlIdGenerator()();
-  const className = classnames('hide-for-sharing', 'headerGlobalNav');
+  public render() {
+    const { application, basePath, intl, isLocked, onIsLockedUpdate, legacyMode } = this.props;
+    const { currentAppId, isVisible, navLinks, recentlyAccessed } = this.state;
 
-  return (
-    <>
-      <header className={className} data-test-subj="headerGlobalNav">
-        <div id="globalHeaderBars">
-          <EuiHeader
-            theme="dark"
-            position="fixed"
-            sections={[
-              {
-                items: [
-                  <HeaderLogo
-                    href={homeHref}
-                    forceNavigation$={observables.forceAppSwitcherNavigation$}
-                    navLinks$={observables.navLinks$}
-                    navigateToApp={application.navigateToApp}
-                  />,
-                  <LoadingIndicator loadingCount$={observables.loadingCount$} />,
-                ],
-                borders: 'none',
-              },
-              {
-                ...(observables.navControlsCenter$ && {
-                  items: [
-                    <EuiShowFor sizes={['m', 'l', 'xl']}>
-                      <HeaderNavControls navControls$={observables.navControlsCenter$} />
-                    </EuiShowFor>,
-                  ],
-                }),
-                borders: 'none',
-              },
-              {
-                items: [
-                  <EuiHideFor sizes={['m', 'l', 'xl']}>
-                    <HeaderNavControls navControls$={observables.navControlsCenter$} />
-                  </EuiHideFor>,
-                  <HeaderHelpMenu
-                    helpExtension$={observables.helpExtension$}
-                    helpSupportUrl$={observables.helpSupportUrl$}
-                    kibanaDocLink={kibanaDocLink}
-                    kibanaVersion={kibanaVersion}
-                  />,
-                  <HeaderNavControls navControls$={observables.navControlsRight$} />,
-                ],
-                borders: 'none',
-              },
-            ]}
-          />
+    if (!isVisible) {
+      return null;
+    }
 
-          <EuiHeader position="fixed">
-            <EuiHeaderSection grow={false}>
-              <EuiHeaderSectionItem border="right" className="header__toggleNavButtonSection">
-                <EuiHeaderSectionItemButton
-                  data-test-subj="toggleNavButton"
-                  aria-label={i18n.translate('core.ui.primaryNav.toggleNavAriaLabel', {
-                    defaultMessage: 'Toggle primary navigation',
-                  })}
-                  onClick={() => setIsNavOpen(!isNavOpen)}
-                  aria-expanded={isNavOpen}
-                  aria-pressed={isNavOpen}
-                  aria-controls={navId}
-                  ref={toggleCollapsibleNavRef}
-                >
-                  <EuiIcon type="menu" size="m" />
-                </EuiHeaderSectionItemButton>
-              </EuiHeaderSectionItem>
+    const navLinksArray = navLinks
+      .filter(navLink => !navLink.hidden)
+      .map(navLink => ({
+        key: navLink.id,
+        label: navLink.title,
 
-              <HeaderNavControls side="left" navControls$={observables.navControlsLeft$} />
-            </EuiHeaderSection>
+        // Use href and onClick to support "open in new tab" and SPA navigation in the same link
+        href: navLink.href,
+        onClick: (event: MouseEvent) => {
+          if (
+            !legacyMode && // ignore when in legacy mode
+            !navLink.legacy && // ignore links to legacy apps
+            !event.defaultPrevented && // onClick prevented default
+            event.button === 0 && // ignore everything but left clicks
+            !isModifiedEvent(event) // ignore clicks with modifier keys
+          ) {
+            event.preventDefault();
+            application.navigateToApp(navLink.id);
+          }
+        },
 
-            <HeaderBreadcrumbs
-              appTitle$={observables.appTitle$}
-              breadcrumbs$={observables.breadcrumbs$}
+        // Legacy apps use `active` property, NP apps should match the current app
+        isActive: navLink.active || currentAppId === navLink.id,
+        isDisabled: navLink.disabled,
+
+        iconType: navLink.euiIconType,
+        icon:
+          !navLink.euiIconType && navLink.icon ? (
+            <EuiImage
+              size="s"
+              alt=""
+              aria-hidden={true}
+              url={basePath.prepend(`/${navLink.icon}`)}
             />
           ) : (
             undefined
