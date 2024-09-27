@@ -526,6 +526,7 @@
     "mutation-observer": "^1.0.3",
     "ngreact": "^0.5.1",
     "nock": "12.0.3",
+    "node-sass": "^6.0.1",
     "normalize-path": "^3.0.0",
     "nyc": "^14.1.1",
     "pixelmatch": "^5.1.0",
@@ -571,6 +572,6 @@
   },
   "engines": {
     "yarn": "^1.21.1",
-    "node": "10.15.2"
+    "node": "16.20.2"
   }
 }
